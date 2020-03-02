@@ -1,13 +1,12 @@
-#Movies
-This project aim is analyse briefly a movies ranking dataset. 
+# Movies Project
+This aim of this project is to make a brief analysis of a movies ranking dataset. 
 
 ## Dataset
-The dataset consist in 3 `.dat` files (movies, ratings and users) and 1 README for instructions.  
+The dataset consists of 3 `.dat` files (movies, ratings and users) and 1 README file for instructions.  
 The files can be downloaded from https://grouplens.org/datasets/movielens/1m/ The files are not included in this project due to license restrictions of the dataset (check the README file when download).
 
 ## Environment
-This was made using `Scala` language, `Spark` data framework and IntelliJ IDE. For dependencies control `sbt` was used. 
-For more details, check the `build.sbt` file 
+This project was made using `Scala` language, `Spark` data framework and IntelliJ IDE. For dependencies control `sbt` was used. For more details, check the `build.sbt` file .
 
 ## Task
 Obtain the average rating per gender and movie release year.
