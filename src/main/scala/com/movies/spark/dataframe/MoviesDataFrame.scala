@@ -22,13 +22,12 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
  *  character "::"
  *
  *  Movies dataset sample:
- *
+ *    MovieID::Title::Genres
  *    2261::One Crazy Summer (1986)::Comedy
  *    2262::About Last Night... (1986)::Comedy|Drama|Romance
  *    2263::Seventh Sign, The (1988)::Thriller
  *
- *  Users Dataset sample:
- *    UserID::MovieID::Rating::Timestamp
+ *  Users Dataset sample:*
  *    UserID::Gender::Age::Occupation::Zip-code
  *    25::M::18::4::01609
  *    26::M::25::7::23112
@@ -46,6 +45,20 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 object MoviesDataFrame {
 
   /**
+   * Loads the .dat files into a dataframe without any preprocessing
+   * @param spkSession
+   * @param pathToFile Path to .dat file
+   * @return DataFrame
+   */
+  def loadDatFile(spkSession:SparkSession, pathToFile: String): DataFrame = {
+    val df = spkSession.read.option("sep", ":")
+      .option("inferSchema", "true")
+      .option("header", "false")
+      .csv(pathToFile)
+    df
+  }
+
+  /**
    * Loads and prepares the movies data into a dataframe. Preprocess the movie
    * release year in a new column.
    * @param spkSession
@@ -53,16 +66,35 @@ object MoviesDataFrame {
    * @return Dataframe [id, name, categories, year]
    */
   def loadMovies(spkSession:SparkSession, pathToFile: String): DataFrame = {
-    val colNames = Seq("id", "null1", "name", "null2", "categories")
-    val df = spkSession.read.option("sep", ":")
-      .option("inferSchema", "true")
-      .option("header", "false")
-      .csv(pathToFile)
+    val colNames = Seq("MovieID", "null1", "Title", "null2", "Genres")
+      val df = loadDatFile(spkSession,pathToFile)
       .toDF(colNames: _*)
       .drop("null1", "null2")
 
-    val moviesDf = df.withColumn("year",  regexp_extract(col("name"),"(\\d{4})", 1))
+    //Extracts the year from the movie name and set it in a new column for future use
+    val moviesDf = df.withColumn("year", regexp_extract(col("Title"),"(\\d{4})"
+      ,1))
+
     moviesDf
+  }
+
+  /**
+   * Process and loads the userds data in a DataFrame. Just keep the users with
+   * genders: Female, Male, Trans, Inter.
+   * @param spkSession
+   * @param pathToFile
+   * @return
+   */
+  def loadUsers(spkSession:SparkSession, pathToFile: String): DataFrame = {
+    val colNames = Seq("UserID", "null1", "Gender", "null2",  "Age", "null3",
+        "Occupation", "null4", "Zip-code")
+    val genders= Seq("M", "F", "T")
+    val usersDf = loadDatFile(spkSession,pathToFile)
+      .toDF(colNames:_*)
+      .drop("null1","null2", "null3", "null4")
+      // Keep records with genders in the genders Sequence
+      .where(col("Gender").isin(genders:_*))
+    usersDf
   }
 
 
@@ -73,7 +105,7 @@ object MoviesDataFrame {
 
 
   def filterUsersByAge(df: DataFrame) : DataFrame = {
-    val usersDF = df.filter(df("age") > 18 and df("age") < 50).toDF()
+    val usersDF = df.filter(df("age") > 17 and df("age") < 50).toDF()
     usersDF
   }
 

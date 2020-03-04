@@ -12,6 +12,9 @@ object Main extends App {
 
   val data = MoviesDataFrame.filterMoviesByYear(1985, MoviesDataFrame.loadMovies(spkSession,"data/movies.dat"))
 
-  data.show(15)
+  data.show(10)
+
+  val usersDf = MoviesDataFrame.loadUsers(spkSession,"data/users.dat")
+  usersDf.show(10)
 
 }
