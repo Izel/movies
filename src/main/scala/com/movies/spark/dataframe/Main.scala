@@ -17,4 +17,7 @@ object Main extends App {
   val usersDf = MoviesDataFrame.loadUsers(spkSession,"data/users.dat")
   usersDf.show(10)
 
+  val ratingsDf = MoviesDataFrame.loadRatings(spkSession,"data/ratings.dat")
+  ratingsDf.show(10)
+
 }

@@ -79,7 +79,7 @@ object MoviesDataFrame {
   }
 
   /**
-   * Process and loads the userds data in a DataFrame. Just keep the users with
+   * Process and loads the users data in a DataFrame. Just keep the users with
    * genders: Female, Male, Trans, Inter.
    * @param spkSession
    * @param pathToFile
@@ -88,7 +88,7 @@ object MoviesDataFrame {
   def loadUsers(spkSession:SparkSession, pathToFile: String): DataFrame = {
     val colNames = Seq("UserID", "null1", "Gender", "null2",  "Age", "null3",
         "Occupation", "null4", "Zip-code")
-    val genders= Seq("M", "F", "T")
+    val genders= Seq("M", "F")
     val usersDf = loadDatFile(spkSession,pathToFile)
       .toDF(colNames:_*)
       .drop("null1","null2", "null3", "null4")
@@ -97,17 +97,57 @@ object MoviesDataFrame {
     usersDf
   }
 
+  /**
+   *
+   * @param spkSession
+   * @param pathToFile
+   * @return
+   */
+  def loadRatings(spkSession:SparkSession, pathToFile: String): DataFrame = {
+    val colNames = Seq("UserID", "null1", "MovieID", "null2", "Rating",
+      "null3", "Timestamp")
+    val ratingsDF = loadDatFile(spkSession,pathToFile)
+      .toDF(colNames:_*)
+      .drop("null1","null2", "null3")
+      .filter("rating <= 5")
 
+    ratingsDF
+  }
+
+  /**
+   * Filter movies released before an specific year
+   * @param year
+   * @param df
+   * @return
+   */
   def filterMoviesByYear(year:Int, df: DataFrame): DataFrame = {
     val moviesDf = df.filter(df("year") > year).toDF()
     moviesDf
   }
 
-
+  /**
+   * Filter the users
+   * @param df
+   * @return DataFrame with users ages between 18 and 49 (inclusive)
+   */
   def filterUsersByAge(df: DataFrame) : DataFrame = {
     val usersDF = df.filter(df("age") > 17 and df("age") < 50).toDF()
     usersDF
   }
 
+  /**
+   * Obtain the average range per gender and year.
+   * @param moviesDf
+   * @param usersDf
+   * @param rankingsDf
+   * @return
+   */
+  def moviesRankingByGender(moviesDf:DataFrame, usersDf:DataFrame, rankingsDf:DataFrame): DataFrame = {
+    val rankDf = rankingsDf
+      .join(rankingsDf, usersDf.col("UserID").equalTo(rankingsDf.col("UserId")))
+      .join(rankingsDf, moviesDf.col("MovieID").equalTo(rankingsDf.col("MovieID")))
+
+    rankDf
+  }
 
 }
