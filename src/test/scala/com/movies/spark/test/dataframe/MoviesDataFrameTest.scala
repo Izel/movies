@@ -4,8 +4,7 @@ import com.movies.spark.dataframe.MoviesDataFrame
 import org.apache.spark.sql.SparkSession
 import org.scalatest._
 
-
-class MoviesDataFrameTest extends  FlatSpec{
+class MoviesDataFrameTest extends FlatSpec {
   val spkSession = SparkSession
     .builder()
     .appName("MoviesRanking")

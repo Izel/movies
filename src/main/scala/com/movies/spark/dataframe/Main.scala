@@ -13,23 +13,23 @@ object Main extends App {
 
   // Loading movies and Obtaining the released ones after 1989
   val data = MoviesDataFrame
-    .filterMoviesByYear(1989,
-      MoviesDataFrame.loadMovies(spkSession,"data/movies.dat")
+    .filterMoviesByYear(
+      1989,
+      MoviesDataFrame.loadMovies(spkSession, "data/movies.dat")
     )
 
   // Loading the users but just ones with ages [18,49]
-  val usersDf = MoviesDataFrame.
-    filterUsersByAge(
-      MoviesDataFrame.loadUsers(spkSession,"data/users.dat")
+  val usersDf = MoviesDataFrame.filterUsersByAge(
+    MoviesDataFrame.loadUsers(spkSession, "data/users.dat")
   )
 
   // Loading the movies rantings
-  val ratingsDf = MoviesDataFrame.
-    loadRatings(spkSession,"data/ratings.dat")
+  val ratingsDf = MoviesDataFrame.loadRatings(spkSession, "data/ratings.dat")
 
   // Obtaining the rankings
   val rankings = MoviesDataFrame
-    .moviesRankingByGender(data,usersDf, ratingsDf)
+    .moviesRankingByGender(data, usersDf, ratingsDf)
 
   rankings.show()
+
 }
