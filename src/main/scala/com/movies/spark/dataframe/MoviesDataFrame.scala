@@ -109,7 +109,7 @@ object MoviesDataFrame {
     val ratingsDF = loadDatFile(spkSession,pathToFile)
       .toDF(colNames:_*)
       .drop("null1","null2", "null3")
-      .filter("rating <= 5")
+      //.filter("rating <= 5")
 
     ratingsDF
   }
@@ -139,13 +139,14 @@ object MoviesDataFrame {
    * Obtain the average range per gender and year.
    * @param moviesDf
    * @param usersDf
-   * @param rankingsDf
+   * @param ratingsDf
    * @return
    */
-  def moviesRankingByGender(moviesDf:DataFrame, usersDf:DataFrame, rankingsDf:DataFrame): DataFrame = {
-    val rankDf = rankingsDf
-      .join(rankingsDf, usersDf.col("UserID").equalTo(rankingsDf.col("UserId")))
-      .join(rankingsDf, moviesDf.col("MovieID").equalTo(rankingsDf.col("MovieID")))
+  def moviesRankingByGender(moviesDf:DataFrame, usersDf:DataFrame, ratingsDf:DataFrame): DataFrame = {
+    val rankDf = ratingsDf
+      .join(usersDf, "UserID")
+      .groupBy("UserID","MovieID", "Gender", "Rating")
+      .agg(avg(ratingsDf.col("rating")),usersDf.col("Gender"))
 
     rankDf
   }

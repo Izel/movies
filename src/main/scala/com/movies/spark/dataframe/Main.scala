@@ -11,13 +11,14 @@ object Main extends App {
     .getOrCreate()
 
   val data = MoviesDataFrame.filterMoviesByYear(1985, MoviesDataFrame.loadMovies(spkSession,"data/movies.dat"))
-
-  data.show(10)
+  //data.show(10)
 
   val usersDf = MoviesDataFrame.loadUsers(spkSession,"data/users.dat")
-  usersDf.show(10)
+  //usersDf.show(10)
 
   val ratingsDf = MoviesDataFrame.loadRatings(spkSession,"data/ratings.dat")
-  ratingsDf.show(10)
+  //ratingsDf.show(10)
 
+  val rankings = MoviesDataFrame.moviesRankingByGender(data,usersDf, ratingsDf)
+  rankings.show(10)
 }
