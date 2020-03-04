@@ -72,7 +72,7 @@ object MoviesDataFrame {
       .drop("null1", "null2")
 
     //Extracts the year from the movie name and set it in a new column for future use
-    val moviesDf = df.withColumn("year", regexp_extract(col("Title"),"(\\d{4})"
+    val moviesDf = df.withColumn("Year", regexp_extract(col("Title"),"(\\d{4})"
       ,1))
 
     moviesDf
@@ -109,7 +109,7 @@ object MoviesDataFrame {
     val ratingsDF = loadDatFile(spkSession,pathToFile)
       .toDF(colNames:_*)
       .drop("null1","null2", "null3")
-      //.filter("rating <= 5")
+      .filter("rating <= 5")
 
     ratingsDF
   }
@@ -145,8 +145,10 @@ object MoviesDataFrame {
   def moviesRankingByGender(moviesDf:DataFrame, usersDf:DataFrame, ratingsDf:DataFrame): DataFrame = {
     val rankDf = ratingsDf
       .join(usersDf, "UserID")
-      .groupBy("UserID","MovieID", "Gender", "Rating")
-      .agg(avg(ratingsDf.col("rating")),usersDf.col("Gender"))
+      .join(moviesDf, "MovieID")
+      .groupBy("MovieID", "Title", "Year", "Gender")
+      .agg(avg(ratingsDf.col("rating")).alias("Avg_rating"))//, usersDf.col("Gender"))
+      .orderBy("MovieID")
 
     rankDf
   }

@@ -10,7 +10,7 @@ object Main extends App {
     .appName("MoviesRanking")
     .getOrCreate()
 
-  val data = MoviesDataFrame.filterMoviesByYear(1985, MoviesDataFrame.loadMovies(spkSession,"data/movies.dat"))
+  val data = MoviesDataFrame.filterMoviesByYear(1989, MoviesDataFrame.loadMovies(spkSession,"data/movies.dat"))
   //data.show(10)
 
   val usersDf = MoviesDataFrame.loadUsers(spkSession,"data/users.dat")
