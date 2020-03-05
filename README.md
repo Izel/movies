@@ -27,8 +27,9 @@ Sample of rating.dat
 ## Environment
 This project was made using `Scala` language, `Spark` data framework and IntelliJ IDE. For dependencies control `sbt` was used. For more details, check the `build.sbt` file.
 
-## Task
-Obtain the average rating per gender and movie release year.
+## Tasks
+1. Obtain the average rating per movies and genre.
+2. Obtain the average rating per gender and movie release year.
 
 ## Conditions
 1. Include movies released after 1989  (movie year > 1989)
@@ -41,6 +42,9 @@ Although the exercise looks very simple it has some technical challenges. A firs
 2. Load the data files into RDDs
 3. Make the filters  for age (users) and year (Movies)
 4. Make the necessary joins
+5. Split the genres
+6. Create genres dataset (necessary?)
+7. Create the relation movie - genre (necessary?)
 
 However, the technical details were interesting and forced me to read some detailed documentation and make 
 a bit more research. The final implemented solution was not far from the first general view and I detail it below:
@@ -80,12 +84,31 @@ UserID|null1|MovieID|null2|Rating|null3|Timestamp
 |     1| null|    661| null|     3| null|978302109
 |     1| null|    914| null|     3| null|978301968
 
+2. The movie genres were in the same dataset separated by `|`. How to create the new rows? how to keep the integrity of the data? It is necessary to create a new dataset for movies and genres? Do I need a genres dataset? if the genres are splitted, how to add the new rows in the dataset?
 
-2. Data without header. It was not a big issue but a bit weird. The column names were added manually. 
+Lots of questions about this topic come out however, most of the technical issues are solved by `scala` and `spark`.  The method `withColum` allows working with a DataFrame adding a new column and `explode`  to create the returned rows by `split`. For more detail watch the video [4] in the _References_ section 
 
-3. The Movies year release was included in the title. It will be a problem for future manipulation of the data. One of the conditions was  _consider only movies, which were released after 1989._ Regular expressions and other DataFrame column functions were necessary.
+``` scala
+def splitGenres(moviesDf: DataFrame): DataFrame = {
+    moviesDf.withColumn("Genres", explode(split(moviesDf.col("Genres"), "[|]")))
+  }
+```
+
+3. Data without header. It was not a big issue but a bit weird. The column names were added manually. 
+
+```scala
+val colNames = Seq("MovieID", "null1", "Title", "null2", "Genres")
+    val df = loadDatFile(spkSession, pathToFile)
+      .toDF(colNames: _*)
+```
+
+4. The Movies year release was included in the title. It will be a problem for future manipulation of the data. One of the conditions was  _consider only movies, which were released after 1989._ Regular expressions and other DataFrame column functions were necessary.
+
+```scala
+df.withColumn("Year", regexp_extract(col("Title"), "(\\d{4})", 1))
+```
  
-4. Spark-core dependencies didn't work with `Scala 2.13.1`. The _Maven_ repository was very useful to check the library dependencies and names  
+5. Spark-core dependencies didn't work with `Scala 2.13.1`. The _Maven_ repository was very useful to check the library dependencies and names  
 
 
 ### To improve
@@ -94,7 +117,9 @@ UserID|null1|MovieID|null2|Rating|null3|Timestamp
 3. Graph the result.
 
 ## The final output
-Solution is a DataFrame ready to operate with.
+Solution for both cases is a DataFrame ready to operate with.
+
+**Tassk 1**
 
 MovieID|               Title|Year|Gender|        Avg_rating
 ---|---|---|---|---|
@@ -120,26 +145,54 @@ MovieID|               Title|Year|Gender|        Avg_rating
 |     10|    GoldenEye (1995)|1995|     F|3.3983050847457625
 
 
+**Task 2**
+
+Year|     Genres|        Avg_rating
+---|---|---|
+|1990|     Action| 3.238399837546959
+|1990|  Adventure|   3.6226254607315
+|1990|  Animation|3.8086956521739133
+|1990| Children's|2.9546520719311964
+|1990|     Comedy|3.2584871108606848
+|1990|      Crime|3.6072922893006574
+|1990|Documentary|3.9831932773109244
+|1990|      Drama| 3.761157239231967
+|1990|    Fantasy|2.6816326530612247
+|1990|  Film-Noir|3.7774762550881955
+|1990|     Horror| 3.347560975609756
+|1990|    Mystery|3.6012965964343597
+|1990|    Romance| 3.413793103448276
+|1990|     Sci-Fi|3.1954931804704487
+|1990|   Thriller|  3.47193129451194
+|1990|    Western|3.4885646687697163
+|1991|     Action|             3.448
+|1991|  Adventure|2.9713855421686746
+|1991|  Animation| 3.930735930735931
+|1991| Children's| 3.930735930735931
+
+
 ## References
 The following documentation was used to understand Scala, Spark, sbt and IntelliJ.
 
 ### Scala
-https://docs.scala-lang.org/getting-started/index.html
+[1] https://docs.scala-lang.org/getting-started/index.html
 
-https://docs.scala-lang.org/tour/tour-of-scala.html
+[2] https://docs.scala-lang.org/tour/tour-of-scala.html
 
-https://docs.scala-lang.org/style/index.html
+[3] https://docs.scala-lang.org/style/index.html
+
+[4] https://www.youtube.com/watch?v=mtTXnsoIbgI
 
 ### Spark
-https://spark.apache.org/docs/latest/sql-getting-started.html
+[5] https://spark.apache.org/docs/latest/sql-getting-started.html
 
-https://spark.apache.org/docs/2.2.1/sql-programming-guide.html
+[6] https://spark.apache.org/docs/2.2.1/sql-programming-guide.html
 
-https://spark.apache.org/docs/latest/
+[7] https://spark.apache.org/docs/latest/
 
-https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package
+[8] https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package
 
-https://intellipaat.com/blog/what-is-apache-spark/
+[9] https://intellipaat.com/blog/what-is-apache-spark/
 
 ### IntelliJ Configuration
-https://www.youtube.com/watch?v=ymLiCXs4dVg
+[10] https://www.youtube.com/watch?v=ymLiCXs4dVg
