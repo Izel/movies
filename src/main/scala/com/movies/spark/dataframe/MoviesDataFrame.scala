@@ -120,6 +120,11 @@ object MoviesDataFrame {
       .filter("rating <= 5")
   }
 
+  def loadMoviesByGenres(spkSession: SparkSession,
+                         moviesDf: DataFrame): DataFrame = {
+    moviesDf.withColumn("Genres", explode(split(moviesDf.col("Genres"), "[|]")))
+  }
+
   /**
     * Filter movies released before an specific year
     * @param year The year to filter
@@ -157,4 +162,8 @@ object MoviesDataFrame {
       .orderBy("MovieID")
   }
 
+  /*def moviesRankingByGenre(moviesDf: DataFrame,
+                           usersDf: DataFrame,
+                           ratingsDf: DataFrame): DataFrame = {}
+ */
 }

@@ -17,7 +17,6 @@ object Main extends App {
       1989,
       MoviesDataFrame.loadMovies(spkSession, "data/movies.dat")
     )
-
   // Loading the users but just ones with ages [18,49]
   val usersDf = MoviesDataFrame.filterUsersByAge(
     MoviesDataFrame.loadUsers(spkSession, "data/users.dat")
@@ -25,11 +24,15 @@ object Main extends App {
 
   // Loading the movies rantings
   val ratingsDf = MoviesDataFrame.loadRatings(spkSession, "data/ratings.dat")
+  //ratingsDf.show(5)
+
+  val mDf = MoviesDataFrame.loadMoviesByGenres(spkSession, data)
+  mDf.show(20)
 
   // Obtaining the rankings
-  val rankings = MoviesDataFrame
-    .moviesRankingByGender(data, usersDf, ratingsDf)
+  //val rankings = MoviesDataFrame
+  //  .moviesRankingByGender(data, usersDf, ratingsDf)
 
-  rankings.show()
+  //rankings.show()
 
 }
