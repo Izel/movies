@@ -139,6 +139,11 @@ object MoviesDataFrame {
     df.filter(df("age") > 17 and df("age") < 50).toDF()
   }
 
+  /**
+    * Splits the Genres columns into rows in the movies DataFrame, creating a new row by each Genre.
+    * @param moviesDf The movies DataFrame
+    * @return DataFrame with additional rows according to the movies genre
+    */
   def splitGenres(moviesDf: DataFrame): DataFrame = {
     moviesDf.withColumn("Genres", explode(split(moviesDf.col("Genres"), "[|]")))
   }
