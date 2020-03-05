@@ -26,13 +26,19 @@ object Main extends App {
   val ratingsDf = MoviesDataFrame.loadRatings(spkSession, "data/ratings.dat")
   //ratingsDf.show(5)
 
-  val mDf = MoviesDataFrame.loadMoviesByGenres(spkSession, data)
-  mDf.show(20)
+  val genresDf = MoviesDataFrame.loadMoviesByGenres(spkSession, data)
+  //mDf.show(20)
 
   // Obtaining the rankings
   //val rankings = MoviesDataFrame
   //  .moviesRankingByGender(data, usersDf, ratingsDf)
 
   //rankings.show()
+
+  // Obtaining the rankings
+  val rankings = MoviesDataFrame
+    .moviesRankingByGenre(genresDf, usersDf, ratingsDf)
+
+  rankings.show()
 
 }

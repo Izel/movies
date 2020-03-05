@@ -162,8 +162,14 @@ object MoviesDataFrame {
       .orderBy("MovieID")
   }
 
-  /*def moviesRankingByGenre(moviesDf: DataFrame,
+  def moviesRankingByGenre(moviesDf: DataFrame,
                            usersDf: DataFrame,
-                           ratingsDf: DataFrame): DataFrame = {}
- */
+                           ratingsDf: DataFrame): DataFrame = {
+    ratingsDf
+      .join(usersDf, "UserID")
+      .join(moviesDf, "MovieID")
+      .groupBy("Year", "Genres")
+      .agg(avg(ratingsDf.col("rating")).alias("Avg_rating"))
+      .orderBy("Year", "Genres")
+  }
 }
