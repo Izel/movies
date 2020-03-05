@@ -120,11 +120,6 @@ object MoviesDataFrame {
       .filter("rating <= 5")
   }
 
-  def loadMoviesByGenres(spkSession: SparkSession,
-                         moviesDf: DataFrame): DataFrame = {
-    moviesDf.withColumn("Genres", explode(split(moviesDf.col("Genres"), "[|]")))
-  }
-
   /**
     * Filter movies released before an specific year
     * @param year The year to filter
@@ -142,6 +137,10 @@ object MoviesDataFrame {
     */
   def filterUsersByAge(df: DataFrame): DataFrame = {
     df.filter(df("age") > 17 and df("age") < 50).toDF()
+  }
+
+  def splitGenres(moviesDf: DataFrame): DataFrame = {
+    moviesDf.withColumn("Genres", explode(split(moviesDf.col("Genres"), "[|]")))
   }
 
   /**
@@ -162,6 +161,13 @@ object MoviesDataFrame {
       .orderBy("MovieID")
   }
 
+  /**
+    * Obtains the rankings of movies by genre
+    * @param moviesDf The movies DataFrame
+    * @param usersDf The users DataFrame.
+    * @param ratingsDf The ratings DataFrame.
+    * @return DataFrame with the year, genre and average rating.
+    */
   def moviesRankingByGenre(moviesDf: DataFrame,
                            usersDf: DataFrame,
                            ratingsDf: DataFrame): DataFrame = {
